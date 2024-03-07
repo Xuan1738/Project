@@ -13,6 +13,9 @@ class Book:
         self.isbn = int(isbn)
         self.quantity = int(quantity)
 
+    def update_quantity(self, change_number):
+        self.quantity = change_number
+
     def display_details(self):
         return f"Title: {self.title}\n Author: {self.author}\n ISBN: {self.isbn}\n Quantity: {self.quantity}"
 
@@ -23,6 +26,9 @@ class Patron:
         self.patron_id = patron_id
         self.contact_info = contact_info
 
+    def update_contact_info(self, new_contact_info):
+        self.contact_info = new_contact_info
+
     def display_details(self):
         return f"Name: {self.name} , Patron ID: {self.patron_id} , Contact Info: {self.contact_info}"
 
@@ -31,8 +37,8 @@ class Transaction:
     def __init__(self, book, patron, due_date, fine):
         self.book = book
         self.patron = patron
-        self.due_date = None
-        self.fine = 0
+        self.due_date = due_date
+        self.fine = fine
 
 
 class Library:
@@ -318,6 +324,7 @@ class LibraryApp(Library):
     def handle_transactions(self):
         book = self.book.get()
         patron = self.name.get()
+        due_date = None
         fine = 0
 
         book_exists = False
@@ -347,9 +354,8 @@ class LibraryApp(Library):
         for transaction in self.library.transactions:
             if transaction.book == book and transaction.patron == patron:
                 if transaction.due_date is not None:  # Check if due_date is not None
-                    time_calc = dt.datetime.strptime(transaction.due_date, "%Y-%m-%d").date()
-                    if dt.date.today() > time_calc:
-                        days_late = (dt.date.today() - time_calc).days
+                    if dt.date.today() > transaction.due_date:
+                        days_late = (dt.date.today() - transaction.due_date).days
                         transaction.fine = days_late * 2
                 available_book.quantity += 1
                 self.library.transactions.remove(transaction)
